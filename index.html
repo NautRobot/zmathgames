@@ -12,6 +12,8 @@
       text-align: center;
       padding: 50px 20px;
       margin: 0;
+      position: relative;
+      overflow-x: hidden;
     }
     .container {
       max-width: 600px;
@@ -20,6 +22,8 @@
       padding: 30px;
       border-radius: 15px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 2;
     }
     h1 {
       color: #1e3c72;
@@ -147,9 +151,22 @@
       transform: translateY(-2px);
       background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
     }
+
+    /* MONEY EMOJI RAIN CANVAS OVERLAY */
+    #moneyCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999;
+    }
   </style>
 </head>
 <body>
+
+  <canvas id="moneyCanvas"></canvas>
 
   <div class="container">
     <h1>zekemathgames</h1>
@@ -215,11 +232,11 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
     let currentUser = null;
+    let cachedPoints = 0;
 
-    // Authenticate user anonymously
     signInAnonymously(auth).catch((err) => {
       console.error("Auth error:", err);
-      document.getElementById('globalPointsDisplay').innerText = "Auth Error";
+      document.getElementById('globalPointsDisplay').innerText = `Auth Error: ${err.code}`;
     });
 
     onAuthStateChanged(auth, async (user) => {
@@ -227,16 +244,14 @@
         currentUser = user;
         const userPointsRef = ref(db, `users/${user.uid}/points`);
 
-        // Check if new user and assign starting bonus (10 pts) if undefined
         const snapshot = await get(userPointsRef);
         if (!snapshot.exists()) {
           await set(userPointsRef, 10);
         }
 
-        // Listen for real-time updates
         onValue(userPointsRef, (snap) => {
-          const points = snap.val() ?? 0;
-          document.getElementById('globalPointsDisplay').innerText = points.toLocaleString();
+          cachedPoints = snap.val() ?? 0;
+          document.getElementById('globalPointsDisplay').innerText = cachedPoints.toLocaleString();
         });
       } else {
         currentUser = null;
@@ -246,7 +261,7 @@
 
     const symbols = ['🍒', '🍋', '🍇', '⭐', '💎'];
 
-    window.spinSlots = function() {
+    window.spinSlots = async function() {
       if (!currentUser) {
         alert("Please wait until you are securely connected to the servers!");
         return;
@@ -254,6 +269,12 @@
 
       const betSelect = document.getElementById('betAmount');
       const bet = parseInt(betSelect.value, 10);
+
+      if (cachedPoints < bet) {
+        alert("Not enough points to place this bet! Play games to earn more.");
+        return;
+      }
+
       const userPointsRef = ref(db, `users/${currentUser.uid}/points`);
       const spinButton = document.getElementById('spinButton');
       const resultMessage = document.getElementById('resultMessage');
@@ -270,7 +291,10 @@
       const outcome3 = symbols[Math.floor(Math.random() * symbols.length)];
 
       let multiplier = 0;
+      let isJackpot = false;
+
       if (outcome1 === outcome2 && outcome2 === outcome3) {
+        isJackpot = true;
         if (outcome1 === '💎') multiplier = 10;
         else if (outcome1 === '⭐') multiplier = 7;
         else multiplier = 5;
@@ -284,59 +308,114 @@
       r2.classList.add('spinning');
       r3.classList.add('spinning');
 
-      runTransaction(userPointsRef, (currentPoints) => {
-        const available = currentPoints || 0;
-        if (available >= bet) {
-          return available + pointChange;
-        } else {
-          return;
-        }
-      }).then((result) => {
-        if (!result.committed) {
-          r1.classList.remove('spinning');
-          r2.classList.remove('spinning');
-          r3.classList.remove('spinning');
-          spinButton.disabled = false;
-          betSelect.disabled = false;
-          resultMessage.innerText = "";
-          alert("Not enough points to place this bet! Play games to earn more.");
-          return;
-        }
-
-        setTimeout(() => {
-          r1.classList.remove('spinning');
-          r1.innerText = outcome1;
-        }, 400);
-
-        setTimeout(() => {
-          r2.classList.remove('spinning');
-          r2.innerText = outcome2;
-        }, 800);
-
-        setTimeout(() => {
-          r3.classList.remove('spinning');
-          r3.innerText = outcome3;
-          spinButton.disabled = false;
-          betSelect.disabled = false;
-
-          if (multiplier > 0) {
-            resultMessage.style.color = "#27ae60";
-            resultMessage.innerText = `🎉 WIN! You got ${multiplier}x payout (+${bet * multiplier} points!)`;
-          } else {
-            resultMessage.style.color = "#e74c3c";
-            resultMessage.innerText = `❌ Ouch! You lost ${bet} points. Try again!`;
-          }
-        }, 1200);
-      }).catch((error) => {
-        console.error("Transaction failed: ", error);
+      // Reel timing animations
+      setTimeout(() => {
         r1.classList.remove('spinning');
+        r1.innerText = outcome1;
+      }, 400);
+
+      setTimeout(() => {
         r2.classList.remove('spinning');
+        r2.innerText = outcome2;
+      }, 800);
+
+      setTimeout(async () => {
         r3.classList.remove('spinning');
+        r3.innerText = outcome3;
+
+        // Display results to user
+        if (multiplier > 0) {
+          resultMessage.style.color = "#27ae60";
+          if (isJackpot) {
+            resultMessage.innerText = `🚨 BIG JACKPOT! 🚨 You got ${multiplier}x payout (+${bet * multiplier} points!)`;
+            triggerMoneyRain();
+          } else {
+            resultMessage.innerText = `🎉 WIN! You got ${multiplier}x payout (+${bet * multiplier} points!)`;
+          }
+        } else {
+          resultMessage.style.color = "#e74c3c";
+          resultMessage.innerText = `❌ Ouch! You lost ${bet} points. Try again!`;
+        }
+
+        // Commit balance changes ONLY after reels finish and result is shown
+        try {
+          await runTransaction(userPointsRef, (currentPoints) => {
+            const available = currentPoints || 0;
+            if (available >= bet) {
+              return available + pointChange;
+            } else {
+              return; // Abort if balance dropped below bet amount
+            }
+          });
+        } catch (error) {
+          console.error("Transaction error: ", error);
+          resultMessage.innerText = "Error syncing points to server.";
+        }
+
         spinButton.disabled = false;
         betSelect.disabled = false;
-        resultMessage.innerText = "Error communicating with server.";
-      });
+      }, 1200);
     };
+
+    // MONEY RAIN ANIMATION FOR BIG JACKPOT
+    function triggerMoneyRain() {
+      const canvas = document.getElementById('moneyCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const moneyEmojis = ['💰', '💵', '💸', '🤑'];
+      const particles = [];
+      const particleCount = 80;
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          emoji: moneyEmojis[Math.floor(Math.random() * moneyEmojis.length)],
+          size: Math.random() * 25 + 25,
+          speedY: Math.random() * 5 + 3,
+          speedX: Math.random() * 3 - 1.5,
+          rotation: Math.random() * 360,
+          spin: Math.random() * 4 - 2
+        });
+      }
+
+      let animationFrame;
+      const startTime = Date.now();
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        particles.forEach((p) => {
+          ctx.save();
+          ctx.font = `${p.size}px serif`;
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillText(p.emoji, 0, 0);
+          ctx.restore();
+
+          p.y += p.speedY;
+          p.x += p.speedX;
+          p.rotation += p.spin;
+
+          if (p.y > canvas.height) {
+            p.y = -50;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+
+        // Run rain animation for 3.5 seconds
+        if (Date.now() - startTime < 3500) {
+          animationFrame = requestAnimationFrame(draw);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          cancelAnimationFrame(animationFrame);
+        }
+      }
+
+      draw();
+    }
   </script>
 </body>
 </html>
