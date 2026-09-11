@@ -1,168 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>zekemathgames</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
-            text-align: center;
-            padding: 50px 20px;
-            margin: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #1e3c72;
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-        }
-        .points-box {
-            background: linear-gradient(135deg, #e8f0fe 0%, #cce0ff 100%);
-            border: 2px solid #1e3c72;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #1e3c72;
-        }
-        .main-image {
-            width: 100%;
-            max-width: 250px;
-            height: auto;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-        .button-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .redirect-btn {
-            display: block;
-            padding: 15px 25px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: white;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            text-decoration: none;
-            border-radius: 8px;
-            transition: transform 0.2s, background 0.2s;
-        }
-        .redirect-btn:hover {
-            transform: translateY(-2px);
-            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
-        }
-        .shop-section {
-            margin: 25px 0;
-            padding: 15px;
-            border-top: 2px dashed #ccc;
-        }
-        .buy-btn {
-            padding: 10px 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .buy-btn:hover {
-            background-color: #219150;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zeke Math Games</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+      text-align: center;
+      padding: 50px 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #1e3c72;
+      margin-bottom: 10px;
+      font-size: 2.5rem;
+    }
+    .points-box {
+      background: linear-gradient(135deg, #e8f0fe 0%, #cce0ff 100%);
+      border: 2px solid #1e3c72;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 20px 0;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #1e3c72;
+    }
+    /* SLOT MACHINE STYLES */
+    .slots-section {
+      margin: 25px 0;
+      padding: 20px;
+      background: #2c3e50;
+      border-radius: 12px;
+      color: white;
+      border: 4px solid #f1c40f;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    }
+    .slots-section h3 {
+      margin-top: 0;
+      color: #f1c40f;
+      font-size: 1.5rem;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+    .slot-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .reel {
+      width: 70px;
+      height: 70px;
+      background: white;
+      color: black;
+      border-radius: 8px;
+      font-size: 2.5rem;
+      line-height: 70px;
+      font-weight: bold;
+      border: 3px solid #7f8c8d;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: transform 0.1s ease-in-out;
+    }
+    .spinning {
+      animation: bounce 0.1s infinite alternate;
+    }
+    @keyframes bounce {
+      from { transform: translateY(-5px); }
+      to { transform: translateY(5px); }
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .bet-select {
+      padding: 8px 15px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 5px;
+      border: 2px solid #f1c40f;
+      background-color: #34495e;
+      color: white;
+      cursor: pointer;
+    }
+    .spin-btn {
+      padding: 12px 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #c0392b;
+      transition: all 0.1s;
+    }
+    .spin-btn:hover {
+      background-color: #ff6b6b;
+    }
+    .spin-btn:active {
+      transform: translateY(4px);
+      box-shadow: none;
+    }
+    .spin-btn:disabled {
+      background-color: #95a5a6;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .result-message {
+      font-size: 1.1rem;
+      font-weight: bold;
+      min-height: 24px;
+      margin-top: 10px;
+      color: #f1c40f;
+    }
+    .button-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 25px;
+    }
+    .redirect-btn {
+      display: block;
+      padding: 15px 25px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: white;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      text-decoration: none;
+      border-radius: 8px;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .redirect-btn:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>zekemathgames</h1>
-        
-        <!-- Live Points Display -->
-        <div class="points-box">
-            ⚡ Total Zeke Points: <span id="globalPointsDisplay">Loading...</span>
-        </div>
-
-        <img src="zeke.jpg" alt="Zeke Math Games" class="main-image">
-
-        <!-- Sample Point Shop -->
-        <div class="shop-section">
-            <h3>Home Shop</h3>
-            <p>Earn 1 Point for every 1 minute of active play on any Zeke game!</p>
-            <button class="buy-btn" onclick="spendPoints(5)">Buy Golden Zeke Badge (5 Points)</button>
-        </div>
-
-        <div class="button-list">
-            <a href="https://nautrobot.github.io/z-clicker" target="_blank" class="redirect-btn">Z-Clicker; Click away and upgrade your Zekes to form an army!</a>
-            <a href="https://nautrobot.github.io/z-tetris" target="_blank" class="redirect-btn">Z-Tetris; Stack and score with these small Zekes.</a>
-            <a href="https://nautrobot.github.io/z-pacman" target="_blank" class="redirect-btn">Z-Pacman; Eat the little Zekes and run from the evil ones!</a>
-        </div>
+  <div class="container">
+    <h1>zekemathgames</h1>
+    
+    <div class="points-box">
+      ⚡ Total Zeke Points: <span id="globalPointsDisplay">Connecting...</span>
     </div>
 
-    <!-- FIREBASE HOME ENGINE -->
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-      import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    <!-- SLOT MACHINE SECTION -->
+    <div class="slots-section">
+      <h3>🎰 Zeke's Lucky Slots 🎰</h3>
+      
+      <div class="slot-container">
+        <div id="reel1" class="reel">🍒</div>
+        <div id="reel2" class="reel">🍋</div>
+        <div id="reel3" class="reel">💎</div>
+      </div>
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyCyD2K3TT7hOfakFPgJ9mMjTEM8Jim9_rA",
-        authDomain: "z-clicker-97488.firebaseapp.com",
-        projectId: "z-clicker-97488",
-        storageBucket: "z-clicker-97488.firebasestorage.app",
-        messagingSenderId: "686862323992",
-        appId: "1:686862323992:web:e25c46b7deb67254278e6d",
-        databaseURL: "https://z-clicker-97488-default-rtdb.firebaseio.com" 
-      };
+      <div class="controls">
+        <select id="betAmount" class="bet-select">
+          <option value="1">1 Point</option>
+          <option value="5">5 Points</option>
+          <option value="10">10 Points</option>
+        </select>
 
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getDatabase(app);
+        <button id="spinButton" class="spin-btn" onclick="spinSlots()">SPIN!</button>
+      </div>
 
-      signInAnonymously(auth).catch(console.error);
+      <div id="resultMessage" class="result-message"></div>
+    </div>
 
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          const userPointsRef = ref(db, `users/${user.uid}/points`);
+    <!-- GAME LINKS -->
+    <div class="button-list">
+      <a href="#" class="redirect-btn">
+        Z-Clicker; Click away and upgrade your Zekes to form an army!
+      </a>
+      <a href="#" class="redirect-btn">
+        Z-Tetris; Stack and score with these small Zekes.
+      </a>
+      <a href="#" class="redirect-btn">
+        Z-Pacman; Eat the little Zekes and run from the evil ones!
+      </a>
+    </div>
+  </div>
 
-          // Live update the points text when points change
-          onValue(userPointsRef, (snapshot) => {
-            const points = snapshot.val() || 0;
-            document.getElementById('globalPointsDisplay').innerText = points.toLocaleString();
-          });
+  <!-- FIREBASE APPLICATION SCRIPT -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-          // Spending points handler
-          window.spendPoints = function(cost) {
-            runTransaction(userPointsRef, (currentPoints) => {
-              const available = currentPoints || 0;
-              if (available >= cost) {
-                return available - cost;
-              } else {
-                return; // Abort if insufficient points
-              }
-            }).then((result) => {
-              if (result.committed) {
-                alert("Purchase successful!");
-              } else {
-                alert("Not enough points! Play games to earn more.");
-              }
-            });
-          };
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyD2K3TT7hOfakFPgJ9mMjTEM8Jim9_rA",
+      authDomain: "z-clicker-97488.firebaseapp.com",
+      projectId: "z-clicker-97488",
+      storageBucket: "z-clicker-97488.firebasestorage.app",
+      messagingSenderId: "686862323992",
+      appId: "1:686862323992:web:e25c46b7deb67254278e6d",
+      databaseURL: "https://z-clicker-97488-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    let currentUser = null;
+
+    signInAnonymously(auth).catch(console.error);
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        const userPointsRef = ref(db, `users/${user.uid}/points`);
+        onValue(userPointsRef, (snapshot) => {
+          const points = snapshot.val() || 0;
+          document.getElementById('globalPointsDisplay').innerText = points.toLocaleString();
+        });
+      } else {
+        currentUser = null;
+        document.getElementById('globalPointsDisplay').innerText = "Not Logged In";
+      }
+    });
+
+    const symbols = ['🍒', '🍋', '🍇', '⭐', '💎'];
+
+    window.spinSlots = function() {
+      if (!currentUser) {
+        alert("Please wait until you are securely connected to the servers!");
+        return;
+      }
+
+      const betSelect = document.getElementById('betAmount');
+      const bet = parseInt(betSelect.value, 10);
+      const userPointsRef = ref(db, `users/${currentUser.uid}/points`);
+      const spinButton = document.getElementById('spinButton');
+      const resultMessage = document.getElementById('resultMessage');
+      const r1 = document.getElementById('reel1');
+      const r2 = document.getElementById('reel2');
+      const r3 = document.getElementById('reel3');
+
+      spinButton.disabled = true;
+      betSelect.disabled = true;
+      resultMessage.innerText = "Spinning...";
+
+      const outcome1 = symbols[Math.floor(Math.random() * symbols.length)];
+      const outcome2 = symbols[Math.floor(Math.random() * symbols.length)];
+      const outcome3 = symbols[Math.floor(Math.random() * symbols.length)];
+
+      let multiplier = 0;
+      if (outcome1 === outcome2 && outcome2 === outcome3) {
+        if (outcome1 === '💎') multiplier = 10;
+        else if (outcome1 === '⭐') multiplier = 7;
+        else multiplier = 5;
+      } else if (outcome1 === outcome2 || outcome2 === outcome3 || outcome1 === outcome3) {
+        multiplier = 2;
+      }
+
+      const pointChange = (bet * multiplier) - bet;
+
+      r1.classList.add('spinning');
+      r2.classList.add('spinning');
+      r3.classList.add('spinning');
+
+      runTransaction(userPointsRef, (currentPoints) => {
+        const available = currentPoints || 0;
+        if (available >= bet) {
+          return available + pointChange;
+        } else {
+          return; // Abort transaction if insufficient points
         }
-      });
-    </script>
+      }).then((result) => {
+        if (!result.committed) {
+          r1.classList.remove('spinning');
+          r2.classList.remove('spinning');
+          r3.classList.remove('spinning');
+          spinButton.disabled = false;
+          betSelect.disabled = false;
+          resultMessage.innerText = "";
+          alert("Not enough points to place this bet! Play games to earn more.");
+          return;
+        }
 
+        setTimeout(() => {
+          r1.classList.remove('spinning');
+          r1.innerText = outcome1;
+        }, 400);
+
+        setTimeout(() => {
+          r2.classList.remove('spinning');
+          r2.innerText = outcome2;
+        }, 800);
+
+        setTimeout(() => {
+          r3.classList.remove('spinning');
+          r3.innerText = outcome3;
+          spinButton.disabled = false;
+          betSelect.disabled = false;
+
+          if (multiplier > 0) {
+            resultMessage.style.color = "#27ae60";
+            resultMessage.innerText = `🎉 WIN! You got ${multiplier}x payout (+${bet * multiplier} points!)`;
+          } else {
+            resultMessage.style.color = "#e74c3c";
+            resultMessage.innerText = `❌ Ouch! You lost ${bet} points. Try again!`;
+          }
+        }, 1200);
+      }).catch((error) => {
+        console.error("Transaction failed: ", error);
+        r1.classList.remove('spinning');
+        r2.classList.remove('spinning');
+        r3.classList.remove('spinning');
+        spinButton.disabled = false;
+        betSelect.disabled = false;
+        resultMessage.innerText = "Error communicating with server.";
+      });
+    };
+  </script>
 </body>
 </html>
