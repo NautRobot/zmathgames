@@ -183,13 +183,13 @@
 
     <!-- GAME LINKS -->
     <div class="button-list">
-      <a href="#" class="redirect-btn">
+      <a href="https://nautrobot.github.io/z-clicker" class="redirect-btn">
         Z-Clicker; Click away and upgrade your Zekes to form an army!
       </a>
-      <a href="#" class="redirect-btn">
+      <a href="https://nautrobot.github.io/z-tetris" class="redirect-btn">
         Z-Tetris; Stack and score with these small Zekes.
       </a>
-      <a href="#" class="redirect-btn">
+      <a href="https://nautrobot.github.io/z-pacman" class="redirect-btn">
         Z-Pacman; Eat the little Zekes and run from the evil ones!
       </a>
     </div>
@@ -199,7 +199,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, runTransaction, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCyD2K3TT7hOfakFPgJ9mMjTEM8Jim9_rA",
@@ -216,14 +216,26 @@
     const db = getDatabase(app);
     let currentUser = null;
 
-    signInAnonymously(auth).catch(console.error);
+    // Authenticate user anonymously
+    signInAnonymously(auth).catch((err) => {
+      console.error("Auth error:", err);
+      document.getElementById('globalPointsDisplay').innerText = "Auth Error";
+    });
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
         const userPointsRef = ref(db, `users/${user.uid}/points`);
-        onValue(userPointsRef, (snapshot) => {
-          const points = snapshot.val() || 0;
+
+        // Check if new user and assign starting bonus (10 pts) if undefined
+        const snapshot = await get(userPointsRef);
+        if (!snapshot.exists()) {
+          await set(userPointsRef, 10);
+        }
+
+        // Listen for real-time updates
+        onValue(userPointsRef, (snap) => {
+          const points = snap.val() ?? 0;
           document.getElementById('globalPointsDisplay').innerText = points.toLocaleString();
         });
       } else {
@@ -277,7 +289,7 @@
         if (available >= bet) {
           return available + pointChange;
         } else {
-          return; // Abort transaction if insufficient points
+          return;
         }
       }).then((result) => {
         if (!result.committed) {
