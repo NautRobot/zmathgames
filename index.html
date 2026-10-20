@@ -52,12 +52,12 @@
       background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
     }
 
-    /* COUNTDOWN STYLE (NO COLOR) */
+    /* HEADER STYLE COUNTDOWN */
     #countdown-container {
       margin-top: 30px;
-      font-size: 1.1rem;
-      font-weight: normal;
-      color: inherit; /* Keeps default text color */
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #1e3c72; 
     }
   </style>
 
@@ -67,12 +67,14 @@
 <body>
 
   <div class="container">
+    <!-- MOVED COUNTDOWN CONTAINER TO TOP FOR HEADER FEEL -->
+    <div id="countdown-container">
+      Next game unlocks in: <br><span id="countdown">Loading...</span>
+    </div>
+
     <div class="button-list" id="btn-list">
       <a href="https://nautrobot.github.io/z-clicker" class="redirect-btn">
         Legacy Z-Clicker; Click away and upgrade your Zekes to form an army!
-      </a>
-      <a href="https://nautrobot.github.io/z-clicker-remastered" class="redirect-btn">
-        Z-Clicker REMASTERED!; Click away to make Zeke gassy until he explodes!
       </a>
       <a href="https://nautrobot.github.io/z-tetris" class="redirect-btn">
         Z-Tetris!; Stack and Score in this Zeke themed Tetris!
@@ -87,11 +89,6 @@
         <a>
        EMAIL FEEDBACK TO s1002796@student.knoxschools.org
       </a>
-    </div>
-
-    <!-- NEW COUNTDOWN CONTAINER -->
-    <div id="countdown-container">
-      Next game unlocks in: <span id="countdown">Loading...</span>
     </div>
   </div>
 
@@ -131,7 +128,8 @@
           newBtn.innerText = "Z-Moto";
           
           // Insert it right before the "MORE COMING SOON" line
-          btnList.insertBefore(newBtn, btnList.children[4]);
+          // Adjusted index because a link was removed
+          btnList.insertBefore(newBtn, btnList.children[3]); 
 
           // 2. Trigger the Confetti explosion (lasts 5 seconds)
           const duration = 5 * 1000;
