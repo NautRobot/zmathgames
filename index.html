@@ -30,106 +30,6 @@
       margin-bottom: 10px;
       font-size: 2.5rem;
     }
-    .points-box {
-      background: linear-gradient(135deg, #e8f0fe 0%, #cce0ff 100%);
-      border: 2px solid #1e3c72;
-      border-radius: 10px;
-      padding: 15px;
-      margin: 20px 0;
-      font-size: 1.4rem;
-      font-weight: bold;
-      color: #1e3c72;
-    }
-    /* SLOT MACHINE STYLES */
-    .slots-section {
-      margin: 25px 0;
-      padding: 20px;
-      background: #2c3e50;
-      border-radius: 12px;
-      color: white;
-      border: 4px solid #f1c40f;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
-    }
-    .slots-section h3 {
-      margin-top: 0;
-      color: #f1c40f;
-      font-size: 1.5rem;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
-    .slot-container {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin: 20px 0;
-    }
-    .reel {
-      width: 70px;
-      height: 70px;
-      background: white;
-      color: black;
-      border-radius: 8px;
-      font-size: 2.5rem;
-      line-height: 70px;
-      font-weight: bold;
-      border: 3px solid #7f8c8d;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-      transition: transform 0.1s ease-in-out;
-    }
-    .spinning {
-      animation: bounce 0.1s infinite alternate;
-    }
-    @keyframes bounce {
-      from { transform: translateY(-5px); }
-      to { transform: translateY(5px); }
-    }
-    .controls {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .bet-select {
-      padding: 8px 15px;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 5px;
-      border: 2px solid #f1c40f;
-      background-color: #34495e;
-      color: white;
-      cursor: pointer;
-    }
-    .spin-btn {
-      padding: 12px 30px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 4px 0 #c0392b;
-      transition: all 0.1s;
-    }
-    .spin-btn:hover {
-      background-color: #ff6b6b;
-    }
-    .spin-btn:active {
-      transform: translateY(4px);
-      box-shadow: none;
-    }
-    .spin-btn:disabled {
-      background-color: #95a5a6;
-      box-shadow: none;
-      cursor: not-allowed;
-      transform: none;
-    }
-    .result-message {
-      font-size: 1.1rem;
-      font-weight: bold;
-      min-height: 24px;
-      margin-top: 10px;
-      color: #f1c40f;
-    }
     .button-list {
       display: flex;
       flex-direction: column;
@@ -152,21 +52,22 @@
       background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
     }
 
-    /* MONEY EMOJI RAIN CANVAS OVERLAY */
-    #moneyCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 999;
+    /* COUNTDOWN STYLE (NO COLOR) */
+    #countdown-container {
+      margin-top: 30px;
+      font-size: 1.1rem;
+      font-weight: normal;
+      color: inherit; /* Keeps default text color */
     }
   </style>
+
+  <!-- External library to trigger the confetti effect easily -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
-    <div class="button-list">
+  <div class="container">
+    <div class="button-list" id="btn-list">
       <a href="https://nautrobot.github.io/z-clicker" class="redirect-btn">
         Legacy Z-Clicker; Click away and upgrade your Zekes to form an army!
       </a>
@@ -182,11 +83,81 @@
       <a>
         MORE COMING SOON! EMAIL FEEDBACK TO s1002796@student.knoxschools.org
       </a>
+      <div>
+        ZMathGames has had an economy revamp! Visit Z-Cases to spin and win! 
+        1 Minute (Actively playing) a game gives 1 Zeke point! 20 to spin a case.
+      </div>
+    </div>
 
-      ZMathGames has had an economy revamp! Visit Z-Cases to spin and win! 
-      1 Minute (Actively playing) a game gives 1 Zeke point! 20 to spin a case.
+    <!-- NEW COUNTDOWN CONTAINER -->
+    <div id="countdown-container">
+      Next game unlocks in: <span id="countdown">Loading...</span>
     </div>
   </div>
+
+  <script>
+    // Target Date: 10:30 AM EST 10/20/2026
+    const targetDate = new Date("Oct 20, 2026 10:30:00 EST").getTime();
+    let hasTriggered = false;
+
+    // Update the count down every 1 second
+    const x = setInterval(function() {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+
+      // Time calculations for days, hours, minutes and seconds
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      // Display the result
+      document.getElementById("countdown").innerHTML = days + "d " + hours + "h " 
+      + minutes + "m " + seconds + "s ";
+
+      // If the count down is over, clear interval and run actions
+      if (distance < 0) {
+        clearInterval(x);
+        document.getElementById("countdown-container").style.display = "none";
+        
+        if (!hasTriggered) {
+          hasTriggered = true;
+          
+          // 1. Create and add the Z-Moto button
+          const btnList = document.getElementById("btn-list");
+          const newBtn = document.createElement("a");
+          newBtn.href = "https://nautrobot.github.io/zmoto-official";
+          newBtn.className = "redirect-btn";
+          newBtn.innerText = "Z-Moto";
+          
+          // Insert it right before the "MORE COMING SOON" line
+          btnList.insertBefore(newBtn, btnList.children[4]);
+
+          // 2. Trigger the Confetti explosion (lasts 5 seconds)
+          const duration = 5 * 1000;
+          const end = Date.now() + duration;
+
+          (function frame() {
+            confetti({
+              particleCount: 7,
+              angle: 60,
+              spread: 55,
+              origin: { x: 0 }
+            });
+            confetti({
+              particleCount: 7,
+              angle: 120,
+              spread: 55,
+              origin: { x: 1 }
+            });
+
+            if (Date.now() < end) {
+              requestAnimationFrame(frame);
+            }
+          }());
+        }
+      }
+    }, 1000);
   </script>
 </body>
 </html>
